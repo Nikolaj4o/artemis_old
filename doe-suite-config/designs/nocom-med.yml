@@ -10,13 +10,13 @@ exp_poly_kzg_mobilenet:
     cpsnark: no_com
     pc_type: kzg
 
-exp_poly_kzg_vgg:
-  n_repetitions: 1
-  host_types: {large: {n: 1, init_roles: setup-base, $CMD$: "[% my_run.cmd %]"}}
-  base_experiment:
-    model: vgg
-    cpsnark: no_com
-    pc_type: kzg
+# exp_poly_kzg_vgg:
+#   n_repetitions: 1
+#   host_types: {large: {n: 1, init_roles: setup-base, $CMD$: "[% my_run.cmd %]"}}
+#   base_experiment:
+#     model: vgg
+#     cpsnark: no_com
+#     pc_type: kzg
 
 
 $ETL$:
