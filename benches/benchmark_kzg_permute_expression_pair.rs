@@ -106,7 +106,7 @@ fn simulate_permute_expression_pair(k: i32) -> Result<Fr, Error> {
 pub fn bench_kzg_permute_expression_pair(c: &mut Criterion) {
     let mut group = c.benchmark_group("kzg_permute");
     
-    for k in 13..20 {
+    for k in 13..28 {
         group.bench_function(BenchmarkId::new("k", k), |b| {
             b.iter(|| {
                 let _ = simulate_permute_expression_pair(k);
@@ -117,7 +117,7 @@ pub fn bench_kzg_permute_expression_pair(c: &mut Criterion) {
 
 criterion_group!{
     name=benches; 
-    config=Criterion::default().sample_size(10); 
+    config=Criterion::default().sample_size(1); 
     targets=bench_kzg_permute_expression_pair
 }
 criterion_main!(benches);

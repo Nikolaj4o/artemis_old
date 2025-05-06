@@ -11,7 +11,7 @@ use rand_core::OsRng;
 
 pub fn bench_kzg_add(c: &mut Criterion) {
     let mut group = c.benchmark_group("kzg_add");
-    for k in 13..20 {
+    for k in 13..28 {
         let extended_len = 1 << k;
         let mut rand_ext_vec: Vec<Fr> = (0..extended_len)
             .map(|_| Fr::random(OsRng))
@@ -31,7 +31,7 @@ pub fn bench_kzg_add(c: &mut Criterion) {
 
 criterion_group!{
     name=benches; 
-    config=Criterion::default(); 
+    config=Criterion::default().sample_size(1); 
     targets=bench_kzg_add
 }
 criterion_main!(benches);

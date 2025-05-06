@@ -1,0 +1,8 @@
+,suite_name,suite_id,exp_name,run,host_type,model,cpsnark,pc_type,prover_time_sec,proof_size_bytes,mean(verifier_time_sec),stddev(verifier_time_sec),max_rss,prover_time_sec_factor_vs_kzg (kzg=1),mean(verifier_time_sec)_factor_vs_kzg (kzg=1),proof_size_bytes_factor_vs_kzg (kzg=1),max_rss_factor_vs_kzg (kzg=1)
+0,poly-kzg,1740051851,exp_poly_ipa_diffusion,0,large,diffusion,poly,kzg,6194.178847236,33024,0.0860079744,0.0008887297091696676,615408704.0,1.0,1.0,1.0,1.0
+1,poly-kzg,1740051851,exp_poly_ipa_gpt2,0,large,gpt2,poly,kzg,5788.716741128,15584,18.432325331,0.02350840387931318,707444596.0,1.0,1.0,1.0,1.0
+2,poly-kzg,1740051851,exp_poly_ipa_mobilenet,0,medium,mobilenet,poly,kzg,1621.445927386,18208,0.0170773746,0.0009855948167854273,187826184.0,1.0,1.0,1.0,1.0
+3,poly-kzg,1740051851,exp_poly_ipa_vgg,0,large,vgg,poly,kzg,693.226979014,16768,0.0141750798,0.0027738515461280915,97909680.0,1.0,1.0,1.0,1.0
+4,poly-kzg,1740051851,exp_poly_kzg_small,2,small,dlrm,poly,kzg,50.445114296,5920,0.0062046868,9.676673269621086e-05,6528012.0,1.0,1.0,1.0,1.0
+5,poly-kzg,1740051851,exp_poly_kzg_small,1,small,resnet18,poly,kzg,105.200542498,14976,0.0097189756,0.0002530024205986972,12178648.0,1.0,1.0,1.0,1.0
+6,poly-kzg,1740051851,exp_poly_kzg_small,0,small,mnist,poly,kzg,6.368995726,10144,0.0080214598,0.0001758899958772528,619372.0,1.0,1.0,1.0,1.0

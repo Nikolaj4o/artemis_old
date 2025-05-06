@@ -15,7 +15,7 @@ use rand_core::OsRng;
 pub fn bench_ipa_fft(c: &mut Criterion) {
   let j = 5;
   let mut group = c.benchmark_group("ipa_fft");
-  for k in 13..20 {
+  for k in 13..28 {
     let domain = EvaluationDomain::new(j,k);
     let omega = domain.get_omega();
     let l = 1<<k;
@@ -31,7 +31,7 @@ pub fn bench_ipa_fft(c: &mut Criterion) {
 
 criterion_group!{
   name=benches; 
-  config=Criterion::default().sample_size(10); 
+  config=Criterion::default().sample_size(1); 
   targets=bench_ipa_fft
 }
 criterion_main!(benches);

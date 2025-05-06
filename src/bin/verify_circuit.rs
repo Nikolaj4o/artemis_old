@@ -1,4 +1,5 @@
-use halo2_proofs::halo2curves::bn256::Fr;
+use halo2_proofs::halo2curves::bn256::G1Affine;
+use halo2curves::bn256::Bn256;
 use zkml::{
   model::ModelCircuit,
   utils::{loader::load_config_msgpack, proving_kzg::verify_circuit_kzg},
@@ -20,7 +21,7 @@ fn main() {
 
   if kzg_or_ipa == "kzg" {
     let config = load_config_msgpack(&config_fname, witness_column_str);
-    let circuit = ModelCircuit::<Fr>::generate_from_msgpack(config, false, witness_column_str, 0, 17, 10);
+    let circuit = ModelCircuit::<G1Affine>::generate_from_msgpack(config, false, witness_column_str, 0, 17, 10, false);
     let k = circuit.k;
     let dot_string = halo2_proofs::dev::circuit_dot_graph(&circuit);
     use plotters::prelude::*;
@@ -32,7 +33,7 @@ fn main() {
 
     halo2_proofs::dev::CircuitLayout::default().render(k as u32, &circuit, &root).unwrap();
     println!("Loaded configuration");
-    verify_circuit_kzg(circuit, &vkey_fname, &proof_fname, &public_vals_fname);
+    verify_circuit_kzg::<Bn256>(circuit, &vkey_fname, &proof_fname, &public_vals_fname);
   } else {
     // Serialization of the verification key doesn't seem to be supported for IPA
     panic!("Not implemented");

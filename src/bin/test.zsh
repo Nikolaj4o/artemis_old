@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 set -xe
 trap "exit" INT TERM
-trap "kill 0" EXIT
+#trap "kill 0" EXIT
 
 # arg1: name = ['mnist', 'resnet', 'dlrm', 'mobilenet', 'vgg', 'gpt2', 'diffusion']
 # arg2: pc_type = ['kzg', 'ipa']
@@ -18,12 +18,16 @@ dir="$5"
 
 cargo +nightly build --release --manifest-path $dir'/Cargo.toml'
 mkdir -p results
+mkdir -p $dir'/params_ipa'
+mkdir -p $dir'/params_kzg_Bls12'
+mkdir -p $dir'/params_kzg_Bn256'
+
 cols=0
 rows=0
 poly_cols=0
 cplink=false
 poly_com=false
-
+pedersen=false
 
 case "$name" in
     mnist)
@@ -31,10 +35,13 @@ case "$name" in
             cols=10
             rows=19
             poly_cols=0
+        elif [ "$cp_snark" = "pedersen" ]; then
+            cols=10
+            rows=19
         else
             cols=10
             rows=15
-            poly_cols=1
+            poly_cols=3
         fi
         # Add MNIST-specific commands here
         # e.g., python mnist_script.py
@@ -108,7 +115,11 @@ case "$name" in
         ;;
     
     gpt2)
-        if [ "$cp_snark" = "cp_link" ]; then
+        if [ "$cp_snark" = "poseidon" ]; then
+            cols=20
+            rows=27
+            poly_cols=0
+        elif [ "$cp_snark" = "cp_link" ]; then
             cols=10
             rows=27
         else 
@@ -122,7 +133,11 @@ case "$name" in
         ;;
     
     diffusion)
-        if [ "$cp_snark" = "cp_link" ]; then
+        if [ "$cp_snark" = "poseidon" ]; then
+            cols=16
+            rows=26
+            poly_cols=0
+        elif [ "$cp_snark" = "cp_link" ]; then
             cols=15
             rows=25
         else 
@@ -172,6 +187,15 @@ case "$cp_snark" in
         poly_com=false
         poly_cols=0
         ;;
+
+    pedersen)
+        cp_link=false
+        poly_com=true
+        pedersen=true
+        if [ "$poly_cols" -lt 3 ]; then
+            poly_cols=3
+        fi
+        ;;
     *)
         echo "Error: Unknown case '$case'"
         echo "Available cases: mnist, resnet, dlrm, mobilenet, vgg, gpt2, diffusion"
@@ -179,4 +203,4 @@ case "$cp_snark" in
         ;;
 esac
 
-$dir/target/release/time_circuit $dir/examples/cifar/$name.msgpack $dir/examples/cifar/$name_ipt\_input.msgpack $pc_type $poly_com $poly_cols $rows $cols $cp_link $num_runs $dir
+$dir/target/release/time_circuit $dir/examples/cifar/$name.msgpack $dir/examples/cifar/$name_ipt\_input.msgpack $pc_type $poly_com $poly_cols $rows $cols $cp_link $pedersen $num_runs $dir

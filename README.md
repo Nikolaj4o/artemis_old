@@ -1,80 +1,59 @@
-# zkml
+# Artemis: Efficient Commit-and-Prove SNARKs for zkML
 
-zkml is a framework for constructing proofs of ML model execution in ZK-SNARKs.
-Read our [blog
-post](https://medium.com/@danieldkang/trustless-verification-of-machine-learning-6f648fd8ba88)
-and [paper](https://arxiv.org/abs/2210.08674) for implementation details.
+This repository contains the implementation of Apollo and Artemis, our CP-SNARK constructions from [our paper](https://arxiv.org/abs/2409.12055).
+The underlying zkML implementation is based on the [zkML](https://github.com/uiuc-kang-lab/zkml) paper/repo.
 
-zkml requires the nightly build of Rust:
+## Requirements
+Rust
 
+### Artifacts
+This repository requires several artifacts related to the model definitions used in the evaluation.
+The model definitions (msgpack files) are stored in `examples/models` (360MB) in an S3 bucket,
+and can be downloaded using the following command:
+```sh
+aws s3 sync s3://pps-artemis-artifacts/models examples/models
 ```
-rustup override set nightly
-```
 
-## Quickstart
+The setup parameters for the polynomial commitments, `params_ipa` (15GB), `params_kzg` (64GB), take up a significant amount of time
+for the larger models to generate (although less than the time of generating the proof).
+To optimize this, it might be useful to generate the setup parameters once and store them for later use.
+The script looks for the setup parameters in the `params_ipa` and `params_kzg` directories in the root code directory.
+In case the setup parameters do not exist in the expected locations, they will be automatically generated when running the benchmarking script.
 
-Run the following commands:
+## Quickstart (local)
+
+To run with `model` for polynomial commitment type (`pc_type`) and CP-SNARK type `cp_snark` do the following:
+
+model takes values in `['mnist', 'resnet', 'dlrm', 'mobilenet', 'vgg', 'gpt2', 'diffusion']`
+
+polynomial commitment takes values in `['kzg', 'ipa']`
+
+CP-SNARK takes values in `['nocom', 'poly', 'cp_link', 'pos', 'cp_link_plus']`
 
 ```sh
-# Installs rust, skip if you already have rust installed
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-git clone https://github.com/ddkang/zkml.git
-cd zkml
 rustup override set nightly
 cargo build --release
-mkdir params_kzg
-mkdir params_ipa
 
-# This should take ~16s to run the first time
-# and ~8s to run the second time
-./target/release/time_circuit examples/mnist/model.msgpack examples/mnist/inp.msgpack kzg
+./src/bin/test.zsh ‘model_name’  ‘pc_type’  ‘cp_snark’  ‘num_runs’ 1 .
+
 ```
 
-This will prove an MNIST circuit! It will require around 2GB of memory and take
-around 8 seconds to run.
+## Running with Doe Suite (remote)
+The evaluation is built using [DoE-Suite](https://github.com/nicolas-kuechler/doe-suite), which allows straightforward reproducibility of results by defining experiments in a configuration file (suite) and executing them on a set of machines. We provide the necessary DoE-Suite commands to reproduce all results. However, it is also possible to obtain the individual commands used to invoke the framework and run them manually.
+For details on running the suites, please refer to the [DoE-Suite documentation](https://nicolas-kuechler.github.io/doe-suite/installation.html#base-installation).
 
+Our artifact contains the following suites:
+<details>
+    <summary>Available Suites</summary>
 
+| Suite                                                                               | Models                                                           | Est. Duration |
+|-------------------------------------------------------------------------------------|------------------------------------------------------------------|---------------|
+| [model-small](doe-suite-config/designs/model-small.yml)                             | mnist, resnet18, dlrm                                            | TODO          |
+| [model-mobilenet](doe-suite-config/designs/mobilenet.yml)                           | MobileNet                                                        | TODO          |
+| [model-vgg](doe-suite-config/designs/vgg.yml)                                       | VGG                                                              | TODO            |
+| [model-diffusion](doe-suite-config/designs/diffusion.yml)                           | Diffusion                                                        | TODO           |
+| [model-gpt2](doe-suite-config/designs/model-gpt2.yml)                               | GPT-2                                                            | TODO           |
 
-## Converting your own model and data
+__TODO__: Add CPLink models and poly_ipa?
 
-To convert your own model and data, you will need to convert the model and data to the format zkml
-expects. Currently, we accept TFLite models. We show an example below.
-
-1. First `cd examples/mnist`
-
-2. We've already created a model that achieves high accuracy on MNIST (`model.tflite`). You will
-   need to create your own TFLite model. One way is to [convert a model from Keras](https://stackoverflow.com/questions/53256877/how-to-convert-kerash5-file-to-a-tflite-file).
-
-3. You will need to convert the model:
-```bash
-python ../../python/converter.py --model model.tflite --model_output converted_model.msgpack --config_output config.msgpack --scale_factor 512 --k 17 --num_cols 10 --num_randoms 1024
-```
-
-There are several parameters that need to be changed depending on the model (`scale_factor`, `k`,
-`num_cols`, and `num_randoms`).
-
-4. You will first need to serialize the model input to numpy's serialization format `npy`. We've
-   written a small script to do this for the first test data point in MNIST:
-```bash
-python data_to_npy.py
-```
-
-5. You will then need to convert the input to the model:
-```bash
-python ../../python/input_converter.py --model_config converted_model.msgpack --inputs 7.npy --output example_inp.msgpack
-```
-
-6. Once you've converted the model and input, you can run the model as above! However, we generally
-   recommend testing the model before proving (you will need to build zkml before running the next
-   line):
-```bash
-cd ../../
-./target/release/test_circuit examples/mnist/converted_model.msgpack examples/mnist/example_inp.msgpack
-```
-
-
-## Contact us
-
-If you're interested in extending or using zkml, please contact us at `ddkang
-[at] g.illinois.edu`.
+</details>

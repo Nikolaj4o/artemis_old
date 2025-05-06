@@ -3,6 +3,57 @@ pub mod curve;
 #[macro_use]
 pub mod field;
 
+
+#[macro_export]
+macro_rules! impl_binops_calls {
+    ($field:ident) => {
+        impl ::core::ops::Neg for $field {
+            type Output = $field;
+
+            #[inline]
+            fn neg(self) -> $field {
+                -&self
+            }
+        }
+
+        impl<'a> ::core::ops::Neg for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn neg(self) -> $field {
+                self.neg()
+            }
+        }
+
+        impl<'a, 'b> ::core::ops::Sub<&'b $field> for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn sub(self, rhs: &'b $field) -> $field {
+                self.sub(rhs)
+            }
+        }
+
+        impl<'a, 'b> ::core::ops::Add<&'b $field> for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn add(self, rhs: &'b $field) -> $field {
+                self.add(rhs)
+            }
+        }
+
+        impl<'a, 'b> ::core::ops::Mul<&'b $field> for &'a $field {
+            type Output = $field;
+
+            #[inline]
+            fn mul(self, rhs: &'b $field) -> $field {
+                self.mul(rhs)
+            }
+        }
+    };
+}
+
 #[macro_export]
 macro_rules! impl_add_binop_specify_output {
     ($lhs:ident, $rhs:ident, $output:ident) => {
